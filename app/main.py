@@ -64,5 +64,18 @@ def update_todo(todo_id):
 
     return jsonify(todo)
 
+@app.route('/api/todos/<int:todo_id>', methods=['DELETE'])
+def delete_todo(todo_id):
+    global todos
+
+    todo = next((t for t in todos if t['id'] == todo_id), None)
+
+    if todo is None:
+        return jsonify({'error': 'Todo not found'}), 404
+    
+    todos = [t for t in todos if t['id'] != todo_id]
+
+    return jsonify({'message': 'Todo deleted successfully'}), 200
+
 if __name__ == '__main__':
     app.run(debug=True, port=3000)
