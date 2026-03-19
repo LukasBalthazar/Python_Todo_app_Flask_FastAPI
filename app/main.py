@@ -44,5 +44,25 @@ def get_todo(todo_id):
     
     return jsonify(todo)
 
+@app.route('/api/todos/<int:todo_id>', methods=['PUT'])
+def update_todo(todo_id):
+    todo = next((t for t in todos if t['id'] == todo_id), None)
+
+    if todo is None:
+        return jsonify({'error': 'Todo not found '}), 404
+    
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+    
+    if 'title' in data:
+        todo['title'] = data['title']
+
+    if 'completed' in data:
+        todo['completed'] = data['completed']
+
+    return jsonify(todo)
+
 if __name__ == '__main__':
     app.run(debug=True, port=3000)
