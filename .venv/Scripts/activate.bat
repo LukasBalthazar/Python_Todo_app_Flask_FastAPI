@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\LBTur\python_projects\python_todo_app_my_version\.venv
+set VIRTUAL_ENV=C:\Users\LBTur\python_projects\python_todo_app_my_version_with_FastAPI\todo_frontend_javascript\.venv
 
 if not defined PROMPT set PROMPT=$P$G
 
