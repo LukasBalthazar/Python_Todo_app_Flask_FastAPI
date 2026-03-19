@@ -35,5 +35,14 @@ def add_todo():
 
     return jsonify(new_todo), 201
 
+@app.route('/api/todos/<int:todo_id>', methods=['GET'])
+def get_todo(todo_id):
+    todo = next((t for t in todos if t['id'] == todo_id), None)
+
+    if todo is None:
+        return({'error': 'Todo not found'}), 404
+    
+    return jsonify(todo)
+
 if __name__ == '__main__':
     app.run(debug=True, port=3000)
