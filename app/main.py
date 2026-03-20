@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 import sqlite3
 
 app = FastAPI()
@@ -79,3 +79,39 @@ def get_todo(todo_id: int):
         return {"error": "Todo not found"}
     
     return dict(todo)
+
+@app.put("/api/todos/{todo_id}")
+async def updated_todo(todo_id: int, request: Request):
+    data = await request.json()
+
+    if not data:
+        raise HTTPException(status_code=400, detail="No data provided")
+    
+    conn = get_db_connection()
+
+    existing_todo = conn.execute(
+        "SELECT * FROM todos WHERE id = ?",
+        (todo_id,)
+    ).fetchone()
+
+    if existing_todo is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Todo not found")
+    
+    updated_title = data.get("title", existing_todo["title"])
+    updated_completed = data.get("completed", existing_todo["completed"])
+
+    conn.execute(
+        "UPDATE todos SET title = ?, completed = ? WHERE id = ?",
+        (updated_title, updated_completed, todo_id)
+    )
+    conn.commit()
+
+    updated_todo = conn.execute(
+        "SELECT * FROM todos WHERE id = ?",
+        (todo_id,)
+    ).fetchone()
+
+    conn.close()
+
+    return dict(updated_todo)
