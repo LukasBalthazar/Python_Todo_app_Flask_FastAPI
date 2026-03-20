@@ -115,3 +115,25 @@ async def updated_todo(todo_id: int, request: Request):
     conn.close()
 
     return dict(updated_todo)
+
+@app.delete("/api/todos/{todo_id}")
+def delete_todo(todo_id: int):
+    conn = get_db_connection()
+
+    existing_todo = conn.execute(
+        "SELECT * FROM todos WHERE id = ?",
+        (todo_id,)
+    ).fetchone()
+
+    if existing_todo is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Todo not found")
+    
+    conn.execute(
+        "DELETE FROM todos WHERE id = ?",
+        (todo_id,)
+    )
+    conn.commit()
+    conn.close()
+
+    return {"message": "Todo deleted succesfully"}
