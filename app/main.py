@@ -63,3 +63,19 @@ async def add_todo(request: Request):
     conn.close()
 
     return dict(new_todo)
+
+@app.get("/api/todos/{todo_id}")
+def get_todo(todo_id: int):
+    conn = get_db_connection()
+
+    todo = conn.execute(
+        "SELECT * FROM todos WHERE id = ?",
+        (todo_id,)
+    ).fetchone()
+
+    conn.close()
+
+    if todo is None:
+        return {"error": "Todo not found"}
+    
+    return dict(todo)
