@@ -28,3 +28,11 @@ def init_db():
     conn.close()
 
 init_db()
+
+@app.get("/api/todos")
+def get_todos():
+    conn = get_db_connection()
+    todos = conn.execute("SELECT * FROM todos").fetchall()
+    conn.close()
+
+    return [dict(todo) for todo in todos]
