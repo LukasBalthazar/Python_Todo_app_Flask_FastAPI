@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 import sqlite3
 
 app = FastAPI()
@@ -36,3 +36,30 @@ def get_todos():
     conn.close()
 
     return [dict(todo) for todo in todos]
+
+@app.post("/api/todos")
+async def add_todo(request: Request):
+    data = await request.json()
+
+    if not data or "title" not in data:
+        return {"error": "Title is required"}
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "INSERT INTO todos (title, completed) VALUES (?, ?)",
+        (data["title"], data.get("completed", False))
+    )
+
+    conn.commit()
+
+    new_todo_id = cursor.lastrowid
+    new_todo = conn.execute(
+        "SELECT * FROM todos WHERE id = ?",
+        (new_todo_id,)
+    ).fetchone()
+
+    conn.close()
+
+    return dict(new_todo)
